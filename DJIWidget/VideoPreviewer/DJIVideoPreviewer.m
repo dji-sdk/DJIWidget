@@ -272,13 +272,12 @@ DJIVideoDataFrameControlDelegate>{
 
 static DJIVideoPreviewer* previewer = nil;
 
-+(DJIVideoPreviewer*) instance
++ (instancetype)instance
 {
-    if(previewer == nil)
-    {
+    if(previewer == nil) {
         @synchronized (self) {
             if (previewer == nil) {
-                previewer = [[DJIVideoPreviewer alloc] init];
+                previewer = [[self alloc] init];
                 previewer.isDefaultPreviewer = YES;
             }
         }
