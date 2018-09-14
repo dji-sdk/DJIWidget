@@ -14,6 +14,20 @@ DJIWidget is available through [CocoaPods](http://cocoapods.org). To install it,
 pod 'DJIWidget', '~> 1.0'
 ```
 
+> Note: 
+> 
+> **1.** Remember to remove the `use_frameworks!` in the pod file in case the project cannot find the DJIWidget's header files.
+> 
+> **2.** In order to use the Objective-C header files of the DJIWidget in the swift project, create a new header file in the project and add the following code to add the DJIWidget's header files:
+> 
+> ~~~
+> #import <DJIWidget/DJIVideoPreviewer.h>
+> ~~~
+> 
+> **3.** Go to Project -> TARGETS -> Build Settings -> Search “bri” -> Double click "Objective-C Bridging Header" -> Drag the "Header.h" file to the pop-up window to set the path.
+> 
+> ![](./bridgeHeader.png)
+
 ## FFmpeg Customization
 
 We have forked the original FFmpeg and added customized features to provide more video frame information including the frame's width and height, frame rate number, etc. These features will help to implement video hardware decoding. 
