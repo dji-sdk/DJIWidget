@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "DJIWidget"
-  s.version      = "1.0"
+  s.version      = "1.1"
   s.summary      = "DJIWidget for DJI iOS Mobile SDK"
   s.homepage     = "https://github.com/dji-sdk/DJIWidget"
   s.license      = { :type => 'CUSTOM', :text => <<-LICENSE
@@ -36,7 +36,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   s.source_files = 'DJIWidget/**/*.{h,m,c}'
   s.ios.public_header_files = 'DJIWidget/**/*.{h}'
   s.ios.vendored_frameworks = 'FFmpeg/FFmpeg.framework'
-  s.xcconfig = { 'HEADER_SEARCH_PATHS' => '"$(PODS_ROOT)/Headers/Public/DJIWidget/FFmpeg/.."/**' }
+  s.xcconfig = { 'HEADER_SEARCH_PATHS' => '"$(PODS_ROOT)/DJIWidget/FFmpeg/FFmpeg.framework/Headers" "$(PODS_ROOT)/Headers/Public/DJIWidget/FFmpeg/.."/**'}
   s.pod_target_xcconfig = {'ENABLE_BITCODE' => 'NO'}
 
 end
