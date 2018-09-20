@@ -11,22 +11,11 @@ For more details of the usage, please check the [DJI Mobile SDK iOS](https://git
 DJIWidget is available through [CocoaPods](http://cocoapods.org). To install it, simply add the following line to your Podfile:
 
 ```ruby
-pod 'DJIWidget', '~> 1.0'
+pod 'DJIWidget', '~> 1.1'
 ```
 
-> Note: 
+> Note: Remember to add `use_frameworks!` in the pod file to use DJIWidget as a dynamic framework in Swift project.
 > 
-> **1.** Remember to remove the `use_frameworks!` in the pod file in case the project cannot find the DJIWidget's header files.
-> 
-> **2.** In order to use the Objective-C header files of the DJIWidget in the swift project, create a new header file in the project and add the following code to add the DJIWidget's header files:
-> 
-> ~~~
-> #import <DJIWidget/DJIVideoPreviewer.h>
-> ~~~
-> 
-> **3.** Go to Project -> TARGETS -> Build Settings -> Search “bri” -> Double click "Objective-C Bridging Header" -> Drag the "Header.h" file to the pop-up window to set the path.
-> 
-> ![](./bridgeHeader.png)
 
 ## FFmpeg Customization
 
