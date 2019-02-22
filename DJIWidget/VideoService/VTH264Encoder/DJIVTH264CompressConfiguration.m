@@ -13,8 +13,8 @@ const NSUInteger kDefaultFrameRate = 30;
 const float kLocalRecordAverageBitRate = 1024 * 1024 * 10;
 const float kLocalRecordMaxBitRate = 1024 * 1024 * 20;
 
-const float kLiveStreamAverageBitRate = 1024 * 1024 * 2;
-const float kLiveStreamMaxBitRate = 1024 * 1024 * 4;
+const float kLiveStreamAverageBitRate = 1024 * 1024 * 1;
+const float kLiveStreamMaxBitRate = 1024 * 1024 * 2;
 
 const float kQuickMovieAverageBitRate = 1024 * 1024 * 10;
 const float kQuickMovieMaxBitRate = 1024 * 1024 * 20;
@@ -126,8 +126,8 @@ typedef NS_ENUM(NSUInteger, DJIVTH264CompressConfigurationEntropyMode) {
             self.profileLevel = DJIVTH264CompressConfigurationProfileLevel_H264_Main_AutoLevel;
             self.averageBitRate = kLiveStreamAverageBitRate;
             self.dataRateLimits = kLiveStreamMaxBitRate;
-            self.realTime = NO;
-            self.maxKeyFrameIntervalDuration = 2;//One key frame every 2 second
+            self.realTime = YES;
+            self.maxKeyFrameIntervalDuration = 1;//One key frame every 2 second
             self.maxKeyFrameInterval = self.maxKeyFrameIntervalDuration * self.expectedFrameRate;
         }
             break;

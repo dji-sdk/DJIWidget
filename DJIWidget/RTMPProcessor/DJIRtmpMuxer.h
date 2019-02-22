@@ -12,17 +12,19 @@
 @class DJIRtmpMuxer;
 
 typedef enum : NSUInteger {
-    DJIRtmpMuxerStatus_Init,
-    DJIRtmpMuxerStatus_prepareIFrame,
-    DJIRtmpMuxerStatus_Connecting,
-    DJIRtmpMuxerStatus_Streaming,
-    DJIRtmpMuxerStatus_Broken,
-    DJIRtmpMuxerStatus_Stoped,
-} DJIRtmpMuxerStatus;
+    DJIRtmpMuxerState_Init,
+    DJIRtmpMuxerState_prepareIFrame,
+    DJIRtmpMuxerState_Connecting,
+    DJIRtmpMuxerState_Streaming,
+    DJIRtmpMuxerState_Broken,
+    DJIRtmpMuxerState_Stoped,
+} DJIRtmpMuxerState;
 
-@protocol DJIRtmpMuxerStatusUpdateDelegate<NSObject>
+@protocol DJIRtmpMuxerStateUpdateDelegate<NSObject>
 
-- (void)rtmpMuxer:(DJIRtmpMuxer *_Nonnull)camera didUpdateStreamState:(DJIRtmpMuxerStatus)status;
+- (void)rtmpMuxer:(DJIRtmpMuxer *_Nonnull)rtmpMuxer didUpdateStreamState:(DJIRtmpMuxerState)state;
+
+- (void)rtmpMuxer:(DJIRtmpMuxer *_Nonnull)rtmpMuxer didUpdateAudioGain:(float)gain;
 
 @end
 
@@ -31,11 +33,11 @@ typedef enum : NSUInteger {
 @interface DJIRtmpMuxer : NSObject  <VideoStreamProcessor,VideoFrameProcessor>
 
 // Status callback delegate
-@property (nonatomic, weak) id <DJIRtmpMuxerStatusUpdateDelegate> _Nullable delegate;
+@property (nonatomic, weak) id <DJIRtmpMuxerStateUpdateDelegate> _Nullable delegate;
 
 @property (nonatomic, assign) BOOL enabled; // Total switch
 // Current state, attention to changes may not be in the main thread
-@property (nonatomic, readonly) DJIRtmpMuxerStatus status;
+@property (nonatomic, readonly) DJIRtmpMuxerState status;
 // Push address, shaped like rtmp://
 @property (nonatomic, strong) NSString* _Nonnull serverURL;
 // Use local audio for mixed streaming, need to be set before starting to be effective
@@ -70,7 +72,7 @@ typedef enum : NSUInteger {
  */
 @property (nonatomic, readonly) double audioGainLevel;
 
--(instancetype _Nullable ) init OBJC_UNAVAILABLE("You must use the initWithVideoPreviewer");
+-(instancetype _Nullable ) init OBJC_UNAVAILABLE("You must use the singleton");
 
 + (instancetype _Nullable)sharedInstance;
 

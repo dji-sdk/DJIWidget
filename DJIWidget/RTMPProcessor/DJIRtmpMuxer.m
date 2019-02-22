@@ -65,6 +65,8 @@ typedef struct _VideoMuxerFrame{
 #import <DJIMidWare/DJIVideoStuckTester.h>
 #endif
 
+#if (ENABLED_LIVESTREAM_AUDIO_INPUT)
+
 static void AudioInputCallback( void                                *aqData,             // 1
                                AudioQueueRef                       inAQ,                // 2
                                AudioQueueBufferRef                 inBuffer,            // 3
@@ -84,6 +86,9 @@ static void AudioInputCallback( void                                *aqData,    
                              NULL);
 }
 
+#else
+#endif
+
 
 @interface DJIRtmpMuxer() <DJIVTH264EncoderOutput> {
     
@@ -101,14 +106,19 @@ static void AudioInputCallback( void                                *aqData,    
     int64_t last_audio_pts;
     int64_t audio_samples_written;
     int64_t video_samples_written;
-    
+	
+#if (ENABLED_LIVESTREAM_AUDIO_INPUT)
+	
     //Audio Queue Input
     AudioStreamBasicDescription  audioRecordDataFormat;
     AudioStreamBasicDescription  audioOutputDataFormat;
     AudioQueueRef                audioQueue;
     AudioQueueBufferRef          audioQueueBuffers[AUDIO_QUEUE_BUFFER_COUNT];
     UInt32                       audioQueueBufferByteSize;
-    
+	
+#else
+#endif
+	
     //must push a video idr before start
     BOOL videoIDRPushed;
     BOOL audioQueueCanUse;
@@ -122,7 +132,7 @@ static void AudioInputCallback( void                                *aqData,    
     DJIAudioSampleBuffer* audioBuffer;
 }
 
-@property (nonatomic, assign) DJIRtmpMuxerStatus status;
+@property (nonatomic, assign) DJIRtmpMuxerState status;
 @property (nonatomic, strong) DJIVTH264Encoder* encoder;
 @property (nonatomic, assign) DJIVideoStreamBasicInfo streamInfo;
 
@@ -152,7 +162,7 @@ static void AudioInputCallback( void                                *aqData,    
 		
 		self.iFrameProvider = [[DJIRtmpIFrameProvider alloc] init];
 		
-		self.status = DJIRtmpMuxerStatus_Init;
+		self.status = DJIRtmpMuxerState_Init;
 		self.smoothHelper = [[DJIVideoPreviewSmoothHelper alloc] init];
 		
 		videoCache = [[DJIWidgetLinkQueue alloc] initWithSize:MUXER_MAX_BUFFER_FRAME_NUM];
@@ -165,8 +175,11 @@ static void AudioInputCallback( void                                *aqData,    
 		_streamInfo.frameRate = 30;
 		_retryCount = INT_MAX;
 		
-		// enable local audio by default
+#if (ENABLED_LIVESTREAM_AUDIO_INPUT)
 		_enableAudio = YES;
+#else
+		_enableAudio = NO;
+#endif
 	}
 	return self;
 }
@@ -183,15 +196,13 @@ static void AudioInputCallback( void                                *aqData,    
 -(void) setupVideoPreviewer:(DJIVideoPreviewer*)videoPreviewer
 {
 	self.videoPreviewer = videoPreviewer;
-	[self.videoPreviewer registFrameProcessor:self];
-	[self.videoPreviewer registStreamProcessor:self];
 }
 
 -(BOOL) streamProcessorHandleFrame:(uint8_t *)data size:(int)size {
     return NO;
 }
 
--(void) setStatus:(DJIRtmpMuxerStatus)status
+-(void) setStatus:(DJIRtmpMuxerState)status
 {
 	_status = status;
 	if (self.delegate && [self.delegate respondsToSelector:@selector(rtmpMuxer:didUpdateStreamState:)]) {
@@ -199,9 +210,17 @@ static void AudioInputCallback( void                                *aqData,    
 	}
 }
 
+-(void) setAudioGainLevel:(double)audioGainLevel
+{
+	_audioGainLevel = audioGainLevel;
+	if (self.delegate && [self.delegate respondsToSelector:@selector(rtmpMuxer:didUpdateAudioGain:)]) {
+		[self.delegate rtmpMuxer:self didUpdateAudioGain:audioGainLevel];
+	}
+}
+
 -(void) dealloc{
-    if (_status == DJIRtmpMuxerStatus_Streaming
-        || _status == DJIRtmpMuxerStatus_Connecting) {
+    if (_status == DJIRtmpMuxerState_Streaming
+        || _status == DJIRtmpMuxerState_Connecting) {
         [self stop];
     }
     
@@ -237,7 +256,7 @@ static void AudioInputCallback( void                                *aqData,    
 -(BOOL) pushFrame:(VideoFrameH264Raw *)rawframe {
     
     if (!videoCache ||
-        (_status != DJIRtmpMuxerStatus_Streaming && _status != DJIRtmpMuxerStatus_Connecting) ||
+        (_status != DJIRtmpMuxerState_Streaming && _status != DJIRtmpMuxerState_Connecting) ||
         !rawframe) {
         return NO;
     }
@@ -290,7 +309,7 @@ static void AudioInputCallback( void                                *aqData,    
     // After receiving the original audio data, if you need gdp2gop, you need to put in the same transcoding queue to achieve synchronization
     // Otherwise it will be directly into the team
     if (!videoCache ||
-        (_status != DJIRtmpMuxerStatus_Streaming && _status != DJIRtmpMuxerStatus_Connecting)) {
+        (_status != DJIRtmpMuxerState_Streaming && _status != DJIRtmpMuxerState_Connecting)) {
         return NO;
     }
     
@@ -315,8 +334,8 @@ static void AudioInputCallback( void                                *aqData,    
 
 -(BOOL) pushAudioFrame:(uint8_t*)data size:(int)size{
     
-    if (!videoCache || (_status != DJIRtmpMuxerStatus_Streaming
-                        && _status != DJIRtmpMuxerStatus_Connecting)) {
+    if (!videoCache || (_status != DJIRtmpMuxerState_Streaming
+                        && _status != DJIRtmpMuxerState_Connecting)) {
         return NO;
     }
     
@@ -343,9 +362,9 @@ static void AudioInputCallback( void                                *aqData,    
 	[self.videoPreviewer registFrameProcessor:self];
 	[self.videoPreviewer registStreamProcessor:self];
 	
-    if (_status == DJIRtmpMuxerStatus_Streaming
-        || _status == DJIRtmpMuxerStatus_Connecting
-        || _status == DJIRtmpMuxerStatus_prepareIFrame) {
+    if (_status == DJIRtmpMuxerState_Streaming
+        || _status == DJIRtmpMuxerState_Connecting
+        || _status == DJIRtmpMuxerState_prepareIFrame) {
         return NO;
     }
     
@@ -357,7 +376,7 @@ static void AudioInputCallback( void                                *aqData,    
     if (_enableAudio) {
         //Start audio queue input when streaming audio is enabled
         if (![self audio_queue_init]) {
-            self.status = DJIRtmpMuxerStatus_Stoped;
+            self.status = DJIRtmpMuxerState_Stoped;
             [self stop];
             return NO;
         }
@@ -367,7 +386,7 @@ static void AudioInputCallback( void                                *aqData,    
         audioQueueCanUse = NO;
     }
     
-    self.status = DJIRtmpMuxerStatus_Connecting;
+    self.status = DJIRtmpMuxerState_Connecting;
     _outputFps = 0;
     _outputKbitPerSec = 0;
     _outputAudioKbitPerSec = 0;
@@ -504,14 +523,14 @@ static void AudioInputCallback( void                                *aqData,    
     while (!workThread.isCancelled) {
         
         // Prepare iframes until done
-        self.status = DJIRtmpMuxerStatus_prepareIFrame;
+        self.status = DJIRtmpMuxerState_prepareIFrame;
         while (!workThread.isCancelled && self.iFrameProvider.status != DJIRtmpIFrameProviderStatusFinish) {
             usleep(10000);
             continue;
         }
         
         // Set the state again, because reconnect will run the logic here
-        self.status = DJIRtmpMuxerStatus_Connecting;
+        self.status = DJIRtmpMuxerState_Connecting;
         INFO(@"rtmp session begin");
         if (![self ffmpeg_init]) {
             NSLog(@"init muxer faield");
@@ -620,7 +639,7 @@ static void AudioInputCallback( void                                *aqData,    
         
         // The overhead in the loop
         uint64_t frame_cost_us = 0;
-        self.status = DJIRtmpMuxerStatus_Streaming;
+        self.status = DJIRtmpMuxerState_Streaming;
         self.audioGainLevel = 0;
         
         for (;;) {
@@ -871,10 +890,10 @@ ThreadEnd:
         [self ffmpeg_shutdown];
         [self ffmpeg_free];
         if (stopWithBrokenStatus) {
-            self.status = DJIRtmpMuxerStatus_Broken;
+            self.status = DJIRtmpMuxerState_Broken;
         }
         else{
-            self.status = DJIRtmpMuxerStatus_Stoped;
+            self.status = DJIRtmpMuxerState_Stoped;
         }
         dispatch_semaphore_signal(threadExitWait);
         INFO(@"rtmp thread exit");
@@ -897,6 +916,7 @@ ThreadEnd:
 #pragma mark - audio queue
 
 - (BOOL)audio_queue_init{
+#if (ENABLED_LIVESTREAM_AUDIO_INPUT)
 	@synchronized(self){
 		AVAudioSession *audioSession = [AVAudioSession sharedInstance];
 		NSError *err = nil;
@@ -953,10 +973,14 @@ ThreadEnd:
 		}
 		return YES;
 	}
+#else
+	return NO;
+#endif
 }
 
 
 - (void)audio_queue_start {
+#if (ENABLED_LIVESTREAM_AUDIO_INPUT)
 	@synchronized(self){
 		if (audioQueue) {
 			OSStatus status = AudioQueueStart(audioQueue, NULL);
@@ -977,9 +1001,12 @@ ThreadEnd:
 			}];
 		}
 	}
+#else
+#endif
 }
 
 - (void)audio_queue_stop {
+#if (ENABLED_LIVESTREAM_AUDIO_INPUT)
 	@synchronized(self){
 		if (audioQueue) {
 			AudioQueuePause(audioQueue);
@@ -992,6 +1019,8 @@ ThreadEnd:
 			}
 		}
 	}
+#else
+#endif
 }
 
 

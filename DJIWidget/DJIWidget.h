@@ -22,7 +22,6 @@ FOUNDATION_EXPORT const unsigned char DJIWidgetVersionString[];
 #import <DJIWidget/DJIStreamCommon.h>
 #import <DJIWidget/DJIVideoPreviewer.h>
 #import <DJIWidget/DJIH264PocQueue.h>
-#import <DJIWidget/DJIAlbumTransfer.h>
 #import <DJIWidget/DJILiveViewRenderTexture.h>
 #import <DJIWidget/DJIReverseDLogFilter.h>
 #import <DJIWidget/DJISmoothDecode.h>
