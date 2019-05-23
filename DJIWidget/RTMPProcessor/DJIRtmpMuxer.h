@@ -72,7 +72,7 @@ typedef enum : NSUInteger {
  */
 @property (nonatomic, readonly) double audioGainLevel;
 
--(instancetype _Nullable ) init OBJC_UNAVAILABLE("You must use the singleton");
+-(instancetype _Nonnull) init OBJC_UNAVAILABLE("You must use the singleton");
 
 + (instancetype _Nullable)sharedInstance;
 
