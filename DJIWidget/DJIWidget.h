@@ -52,7 +52,10 @@ FOUNDATION_EXPORT const unsigned char DJIWidgetVersionString[];
 #import <DJIWidget/DJIRTPlayerRenderView.h>
 #import <DJIWidget/DJICameraRemotePlayerView.h>
 #import <DJIWidget/DJIVTH264DecoderIFrameData.h>
-
+#import <DJIWidget/DJIAlbumTransfer.h>
+#import <DJIWidget/DJIDecodeImageCalibrateDataBuffer.h>
+#import <DJIWidget/DJIDecodeImageCalibrateDataSource.h>
+#import <DJIWidget/DJILiveViewColorSpaceFilter.h>
 
 /*------------VTH264Encoder------------*/
 #import <DJIWidget/DJIVTH264CompressConfiguration.h>
