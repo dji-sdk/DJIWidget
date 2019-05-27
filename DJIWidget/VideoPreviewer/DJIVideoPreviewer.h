@@ -145,7 +145,7 @@ typedef NS_ENUM(NSUInteger, DJIVideoPreviewerType){
 /**
  *  get default previewer
  */
-+(DJIVideoPreviewer*) instance;
++ (instancetype)instance;
 
 // SDK
 /**
