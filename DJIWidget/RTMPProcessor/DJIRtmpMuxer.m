@@ -195,7 +195,18 @@ static void AudioInputCallback( void                                *aqData,    
 
 -(void) setupVideoPreviewer:(DJIVideoPreviewer*)videoPreviewer
 {
+    if (self.videoPreviewer) {
+        [self.videoPreviewer removeObserver:self forKeyPath:@"realTimeFrameRate"];
+    }
+    
 	self.videoPreviewer = videoPreviewer;
+    
+    if (videoPreviewer) {
+        [videoPreviewer addObserver:self
+                         forKeyPath:@"realTimeFrameRate"
+                            options:NSKeyValueObservingOptionNew
+                            context:nil];
+    }
 }
 
 -(BOOL) streamProcessorHandleFrame:(uint8_t *)data size:(int)size {
@@ -440,14 +451,45 @@ static void AudioInputCallback( void                                *aqData,    
 
 #pragma mark - stream processor interface
 
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
+    if ([keyPath isEqualToString:@"realTimeFrameRate"]) {
+        [self frameRateChangeHandler];
+    }
+}
+
+- (void)frameRateChangeHandler {
+    // 判断是否支持动态帧率监测，rtmpMuxer是个单例
+    // 如果不支持则return 不做处理
+    if (self.videoPreviewer.detectRealtimeFrameRate == NO) {
+        return;
+    }
+    
+    // 这里仅改变streamInfo中的值去用于计算PTS，不用调用streamConfigDidChanged
+    DJIVideoStreamBasicInfo streamInfo = {0};
+    streamInfo = self.streamInfo;
+    streamInfo.frameRate = (int)self.videoPreviewer.realTimeFrameRate;
+    if (memcmp(&_streamInfo, &streamInfo, sizeof(DJIVideoStreamBasicInfo)) != 0) {
+        _streamInfo = streamInfo;
+    }
+}
+
 -(BOOL) streamProcessorEnabled{
     return _enabled;
 }
 
 -(void) streamProcessorInfoChanged:(DJIVideoStreamBasicInfo *)info{
-    _streamInfo = *info;
-    _encoder.streamInfo = *(info);
-    streamConfigDidChanged = YES;
+    DJIVideoStreamBasicInfo streamInfo = *info;
+    
+    // 是否支持动态帧率监测
+    if (self.videoPreviewer.detectRealtimeFrameRate) {
+        streamInfo.frameRate = (int)self.videoPreviewer.realTimeFrameRate;
+    }
+    
+    if (memcmp(&_streamInfo, &streamInfo, sizeof(DJIVideoStreamBasicInfo)) != 0) {
+        _streamInfo = streamInfo;
+        _encoder.streamInfo = streamInfo;
+        streamConfigDidChanged = YES;
+    }
 }
 
 -(void) streamProcessorPause{
