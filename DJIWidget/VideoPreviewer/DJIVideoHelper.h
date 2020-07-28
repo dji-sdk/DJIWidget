@@ -30,6 +30,7 @@ typedef NS_ENUM(NSUInteger, H264EncoderType){
     H264EncoderType_1860_Inspire2_FPV = 11, //inspire2'fpv camera.
     H264EncoderType_GD600 = 12, //gd600camera camera.
     H264EncoderType_MavicAir = 13, //wm230 eagle 1
+    H264EncoderType_MavicMini = 14
 };
 
 ////For acquiring pre-construction I frame struct
