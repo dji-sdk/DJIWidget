@@ -36,7 +36,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   s.source_files = 'DJIWidget/**/*.{h,m,c}'
   s.ios.public_header_files = 'DJIWidget/**/*.{h}'
   s.ios.vendored_frameworks = 'FFmpeg/FFmpeg.framework'
-  s.xcconfig = { 'HEADER_SEARCH_PATHS' => '"$(PODS_ROOT)/DJIWidget/FFmpeg/FFmpeg.framework/Headers" "$(PODS_ROOT)/Headers/Public/DJIWidget/FFmpeg/.."/**', 'OTHER_LDFLAGS' => '"$(inherited)" -framework "FFmpeg"', 'VALID_ARCHS' => 'arm64 x86_64'}
-  s.pod_target_xcconfig = {'ENABLE_BITCODE' => 'NO'}
+  s.xcconfig = { 'HEADER_SEARCH_PATHS' => '"$(PODS_ROOT)/DJIWidget/FFmpeg/FFmpeg.framework/Headers" "$(PODS_ROOT)/Headers/Public/DJIWidget/FFmpeg/.."/**', 'OTHER_LDFLAGS' => '"$(inherited)" -framework "FFmpeg"'}
+  s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64 armv7 i386', "EXCLUDED_ARCHS[sdk=iphoneos*]" => "x86_64 armv7 i386"}
+  s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64 armv7 i386', "EXCLUDED_ARCHS[sdk=iphoneos*]" => "x86_64 armv7 i386"}
 
 end
