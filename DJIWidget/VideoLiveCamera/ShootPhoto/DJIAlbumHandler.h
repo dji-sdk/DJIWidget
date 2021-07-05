@@ -11,6 +11,6 @@ typedef void (^DJIAlbumCompletionBlock)(NSError * _Nullable error);
 
 @interface DJIAlbumHandler : NSObject
 
-+ (void) savePhotoToAssetLibrary:(NSURL *)url completionBlock:(DJIAlbumCompletionBlock)completion;
++ (void) savePhotoToAssetLibrary:(NSURL * _Nonnull)url completionBlock:(DJIAlbumCompletionBlock _Nullable)completion;
 
 @end
