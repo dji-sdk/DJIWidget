@@ -52,7 +52,7 @@
                                                  usingBlock:^(NSNotification *notification) {
         __typeof__ (self) strongSelf = weakSelf;
         if (strongSelf) {
-            CVOpenGLESTextureCacheFlush([self coreVideoTextureCache], 0);
+            CVOpenGLESTextureCacheFlush([strongSelf coreVideoTextureCache], 0);
         }
     }];
     

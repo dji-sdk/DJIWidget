@@ -20,7 +20,7 @@
 
 @property(readwrite, nonatomic) BOOL initialized;
 @property(readonly, nonatomic) BOOL released;
-@property(readonly, nonatomic) DJILiveViewRenderContext* context;
+@property(weak, readonly, nonatomic) DJILiveViewRenderContext* context;
 @property(readwrite, copy, nonatomic) NSString *vertexShaderLog;
 @property(readwrite, copy, nonatomic) NSString *fragmentShaderLog;
 @property(readwrite, copy, nonatomic) NSString *programLog;
