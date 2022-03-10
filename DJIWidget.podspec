@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "DJIWidget"
-  s.version      = "1.6.5"
+  s.version      = "1.6.6"
   s.summary      = "DJIWidget for DJI iOS Mobile SDK"
   s.homepage     = "https://github.com/dji-sdk/DJIWidget"
   s.license      = { :type => 'CUSTOM', :file => 'LICENSE.txt' }

@@ -418,7 +418,8 @@ void DJIHWDecoderDidDecompress( void *decompressionOutputRefCon, void *sourceFra
     //load dummy_i frame
     
     //if we dont know the encoder type, do not use prebuild IDR frame
-    if (_encoderType == H264EncoderType_unknown) {
+    if (_encoderType == H264EncoderType_unknown ||
+        _encoderType == H264EncoderType_DJIMini2) {
         return 0;
     }
     

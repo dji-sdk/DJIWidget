@@ -32,6 +32,7 @@ typedef NS_ENUM(NSUInteger, H264EncoderType){
     H264EncoderType_MavicAir = 13, //wm230 eagle 1
     H264EncoderType_MavicMini = 14,
     H264EncoderType_MavicAir2 = 15,
+    H264EncoderType_DJIMini2 = 16,
 };
 
 ////For acquiring pre-construction I frame struct

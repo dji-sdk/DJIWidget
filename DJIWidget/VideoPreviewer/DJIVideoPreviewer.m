@@ -327,7 +327,8 @@ static DJIVideoPreviewer* previewer = nil;
     
     _lastDataInputTime = [self getTickCount];
     if (_status.isRunning) {
-        if (_encoderType == H264EncoderType_LightBridge2) {
+        if (_encoderType == H264EncoderType_LightBridge2 ||
+            _encoderType == H264EncoderType_DJIMini2) {
             ////Remove the extra aud in lb2
             [_lb2AUDRemove parse:videoData inSize:len];
         }else{
